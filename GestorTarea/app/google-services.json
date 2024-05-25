@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "390665408311",
+    "project_id": "gestortareas-e648a",
+    "storage_bucket": "gestortareas-e648a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390665408311:android:bc4c87c9e5c22eb918d4b2",
+        "android_client_info": {
+          "package_name": "com.app.gestortarea"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEP4cRDHw3vrz5mnlmO8gUO54zLqRyvIM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
