@@ -18,6 +18,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -49,7 +50,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object MyNavBar : NavBarInt {
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content(
         navController: NavController,
@@ -149,7 +149,6 @@ fun MyTopBarUser(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyDrawerContentUser(
     navController: NavController,
@@ -163,37 +162,29 @@ fun MyDrawerContentUser(
             modifier
                 .fillMaxSize()
                 .background(Color(0xFF42A5F5))
+                .padding(16.dp)
         ) {
-            Column {
-                Text(text = "Usuario")
+            Text(
+                text = "Usuario",
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-                Text(
-                    text = "Administrar Tareas",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable { navController.navigate(Vistas.VistaTareas.route) }
-                )
-                Text(
-                    text = "Calendario",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable { navController.navigate(Vistas.VistaCalendario.route) }
-                )
-                Text(
-                    text = "Cerrar sesion",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable {
-                            val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-                            with(sharedPreferences.edit()) {
-                                remove("user_email")
-                                putBoolean("is_logged_in", false)
-                                apply()
-                            }
-                            WorkManager.getInstance(context).cancelUniqueWork("TaskReminderWork")
-                            navController.navigate(Vistas.LoginVista.route)
-                        }
-                )
+            DrawerItem("Administrar Tareas") {
+                navController.navigate(Vistas.VistaTareas.route)
+            }
+            DrawerItem("Calendario") {
+                navController.navigate(Vistas.VistaCalendario.route)
+            }
+
+            DrawerItem("Cerrar sesión") {
+                val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                with(sharedPreferences.edit()) {
+                    remove("user_email")
+                    putBoolean("is_logged_in", false)
+                    apply()
+                }
+                WorkManager.getInstance(context).cancelUniqueWork("TaskReminderWork")
+                navController.navigate(Vistas.LoginVista.route)
             }
         }
     }
@@ -201,6 +192,17 @@ fun MyDrawerContentUser(
         onBackPress()
     }
 }
+
+@Composable
+fun DrawerItem(text: String, onClick: () -> Unit) {
+    Text(
+        text = text,
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onClick)
+    )
+}
+
 
 @Composable
 fun BackPressHandlerUser(enabled: Boolean = true, onBackPressed: () -> Unit) {

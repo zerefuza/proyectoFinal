@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.app.gestortarea.componentes.navBar.MyNavBar
+import com.app.gestortarea.componentes.obtenerColorPorTiempoRestante
+import com.app.gestortarea.componentes.obtenerTareasPorUrgencia
 import com.app.gestortarea.modeloDatos.Tarea
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
@@ -79,16 +81,11 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
     LaunchedEffect(Unit) {
         sharedViewModel.obtenerTareas(sharedViewModel.userEmail.value) { tareasObtenidas ->
-            val hoy = LocalDate.now()
-            val (tareasPasadasTemp, tareasFuturas) = tareasObtenidas.partition { tarea ->
-                val esPasada = tarea.fecha?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()?.isBefore(hoy) ?: false
-                esPasada && !tarea.completada
-            }
-            tareasPasadas = tareasPasadasTemp
-            tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasFuturas, "POCO_URGENTE")
-            tareasUrgentes  = obtenerTareasPorUrgencia(tareasFuturas, "URGENTE")
-            tareasMuyUrgentes = obtenerTareasPorUrgencia(tareasFuturas, "MUY_URGENTE")
-            tareasCompletadas = tareasFuturas.filter { it.completada } // Filtrar tareas completadas
+            tareasPasadas = obtenerTareasPorUrgencia(tareasObtenidas, "PASADAS")
+            tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "POCO_URGENTE")
+            tareasUrgentes  = obtenerTareasPorUrgencia(tareasObtenidas, "URGENTE")
+            tareasMuyUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "MUY_URGENTE")
+            tareasCompletadas = obtenerTareasPorUrgencia(tareasObtenidas, "COMPLETADAS")
         }
     }
 
@@ -206,14 +203,7 @@ fun TareaGrupo(tareas: List<Tarea>, navController: NavController, sharedViewMode
 
 @Composable
 fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: SharedViewModel, tipo: String) {
-    val cardColor = when (tipo) {
-        "muy urgente" -> Color.Red
-        "poco urgente" -> Color.Cyan
-        "completadas" -> Color.Green
-        "pasadas" -> Color.Gray
-        "urgente" -> Color(0xFFFFA500)
-        else -> Color.White
-    }
+    val cardColor = obtenerColorPorTiempoRestante(tarea)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -224,7 +214,7 @@ fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: Shared
                     navController.navigate(Vistas.VistaTareasModificar.route)
                 }
             },
-        colors = CardDefaults.cardColors(containerColor = cardColor),
+        colors =CardDefaults.cardColors(cardColor?: Color.White),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -250,7 +240,7 @@ fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: Shared
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.getDefault()).format(tarea.fecha),
+                    text = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault()).format(tarea.fecha),
                     style = TextStyle(fontSize = 14.sp),
                 )
             }
@@ -271,17 +261,3 @@ fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: Shared
 
 
 
-fun obtenerTareasPorUrgencia(tareas: List<Tarea>, nivelUrgencia: String): List<Tarea> {
-    val hoy = LocalDate.now()
-    return tareas.filter { tarea ->
-        val fechaTarea = tarea.fecha?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
-        val diasHastaVencimiento = ChronoUnit.DAYS.between(hoy, fechaTarea)
-        val completada = tarea.completada
-        when (nivelUrgencia) {
-            "MUY_URGENTE" -> diasHastaVencimiento <= 1 && !completada
-            "URGENTE" -> diasHastaVencimiento in 2..3 && !completada
-            "POCO_URGENTE" -> diasHastaVencimiento > 3 && !completada
-            else -> false
-        }
-    }
-}

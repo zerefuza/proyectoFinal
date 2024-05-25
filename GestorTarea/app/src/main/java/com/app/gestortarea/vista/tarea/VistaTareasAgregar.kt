@@ -101,7 +101,7 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
             // Fecha de fin
             MiDatePicker(
                 onFechaSeleccionada = { fecha -> fechaFin = fecha },
-                fechaInicial = fechaFin,
+                fechaInicial = if(fechaFin==null){sharedViewModel.fechaTarea.value}else{fechaFin},
             )
 
 
@@ -128,6 +128,7 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                                 sharedViewModel.userEmail.value,
                                 tareaData
                             ){
+                                sharedViewModel.setFechaTarea(null)
                                 navController.navigate(Vistas.VistaTareas.route)
                             }
                         }

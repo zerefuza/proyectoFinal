@@ -17,6 +17,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class SharedViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
@@ -37,6 +38,14 @@ class SharedViewModel : ViewModel() {
 
     fun setTituloTarea(_tituloTarea: String) {
         this._tituloTarea.value = _tituloTarea
+    }
+
+    //guardar fecha tarea
+    private val _fechaTarea = mutableStateOf<Date?>(null)
+    val fechaTarea: State<Date?> = _fechaTarea
+
+    fun setFechaTarea(_fechaTarea: Date?) {
+        this._fechaTarea.value = _fechaTarea
     }
 
     //login de usuario auth
