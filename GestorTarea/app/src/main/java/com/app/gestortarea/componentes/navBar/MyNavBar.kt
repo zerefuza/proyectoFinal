@@ -3,6 +3,7 @@ package com.app.gestortarea.componentes.navBar
 import android.content.Context
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,13 +13,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Task
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -39,11 +44,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.work.WorkManager
+import com.app.gestortarea.R
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import kotlinx.coroutines.delay
@@ -156,28 +165,56 @@ fun MyDrawerContentUser(
     onBackPress: () -> Unit,
 ) {
     val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val email = sharedPreferences.getString("user_email", null)
 
     ModalDrawerSheet(modifier) {
         Column(
             modifier
                 .fillMaxSize()
-                .background(Color(0xFF42A5F5))
+                .background(Color(0xFF8D0DF5))
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Usuario",
-                modifier = Modifier.padding(bottom = 16.dp)
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .size(250.dp)
+                    .padding(bottom = 16.dp)
+                    .align(Alignment.CenterHorizontally)
             )
 
-            DrawerItem("Administrar Tareas") {
+            Text(
+                text = email ?: "",
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
+
+            Divider(
+                color = Color.White,
+                thickness = 1.dp,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            DrawerItem(
+                text = "Administrar Tareas",
+                icon = Icons.Filled.Task
+            ) {
                 navController.navigate(Vistas.VistaTareas.route)
             }
-            DrawerItem("Calendario") {
+
+            DrawerItem(
+                text = "Calendario",
+                icon = Icons.Default.CalendarToday
+            ) {
                 navController.navigate(Vistas.VistaCalendario.route)
             }
 
-            DrawerItem("Cerrar sesión") {
-                val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            DrawerItem(
+                text = "Cerrar sesión",
+                icon = Icons.Default.Logout
+            ) {
                 with(sharedPreferences.edit()) {
                     remove("user_email")
                     putBoolean("is_logged_in", false)
@@ -194,13 +231,28 @@ fun MyDrawerContentUser(
 }
 
 @Composable
-fun DrawerItem(text: String, onClick: () -> Unit) {
-    Text(
-        text = text,
+fun DrawerItem(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Row(
         modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 8.dp)
-            .clickable(onClick = onClick)
-    )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier
+                .size(35.dp)
+                .padding(end = 16.dp)
+        )
+        Text(
+            text = text
+        )
+    }
 }
 
 

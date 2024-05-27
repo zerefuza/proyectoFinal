@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.gestortarea.componentes.InputComun
 import com.app.gestortarea.componentes.MiDatePicker
+import com.app.gestortarea.componentes.PopUpConfirmacion
 import com.app.gestortarea.componentes.botonEnvio
 import com.app.gestortarea.componentes.enableTarea
 import com.app.gestortarea.componentes.enableTareaMarcarHecha
@@ -48,6 +49,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
     var descripcion by remember { mutableStateOf("") }
     var fechaFin by remember { mutableStateOf<Date?>(null) }
     var completada by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         sharedViewModel.obtenerTareaPorTitulo(
@@ -124,7 +126,8 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                     val tareaData = Tarea(
                         nombre = titulo,
                         descripcion = descripcion,
-                        fecha = fechaFin
+                        fecha = fechaFin,
+                        completada = false
                     )
                     sharedViewModel.modificarTarea(
                         sharedViewModel.userEmail.value,
@@ -138,27 +141,29 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
             }
 
             // Botón de hecho
-            botonEnvio(
-                "Terminar tarea",
-                "hecho",
-                inputValido = enableTareaMarcarHecha(
-                    titulo
-                )
-            ) {
-                if (fechaFin != null) {
-                    val tareaData = Tarea(
-                        nombre = titulo,
-                        descripcion = descripcion,
-                        fecha = fechaFin,
-                        completada = true
+            if (!completada) {
+                botonEnvio(
+                    "Terminar tarea",
+                    "hecho",
+                    inputValido = enableTareaMarcarHecha(
+                        titulo
                     )
-                    sharedViewModel.modificarTarea(
-                        sharedViewModel.userEmail.value,
-                        sharedViewModel.tituloTarea.value,
-                        tareaData
-                    ) {
-                        sharedViewModel.setTituloTarea("")
-                        navController.navigate(Vistas.VistaTareas.route)
+                ) {
+                    if (fechaFin != null) {
+                        val tareaData = Tarea(
+                            nombre = titulo,
+                            descripcion = descripcion,
+                            fecha = fechaFin,
+                            completada = true
+                        )
+                        sharedViewModel.modificarTarea(
+                            sharedViewModel.userEmail.value,
+                            sharedViewModel.tituloTarea.value,
+                            tareaData
+                        ) {
+                            sharedViewModel.setTituloTarea("")
+                            navController.navigate(Vistas.VistaTareas.route)
+                        }
                     }
                 }
             }
@@ -170,18 +175,32 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                     titulo
                 )
             ) {
-                if (fechaFin != null) {
-                    sharedViewModel.borrarTareasPorTitulo(
-                        sharedViewModel.userEmail.value,
-                        titulo
-                    ) {
-                        if (it) {
-                            sharedViewModel.setTituloTarea("")
-                            navController.navigate(Vistas.VistaTareas.route)
-                        }
-                    }
-                }
+                showDialog = true
             }
         }
+    }
+    if (showDialog) {
+        PopUpConfirmacion(
+            titulo = "¿Estas seguro que deseas eliminar esta tarea?",
+            descripcion = "Esta a punto de eliminar la tarea ${titulo}",
+            onSuccess = {
+                sharedViewModel.borrarTareasPorTitulo(
+                    sharedViewModel.userEmail.value,
+                    sharedViewModel.tituloTarea.value
+                ) {
+                    if (it) {
+                        sharedViewModel.setTituloTarea("")
+                        navController.navigate(Vistas.VistaTareas.route)
+                    }
+                }
+                showDialog = false
+            },
+            onError = {
+                showDialog = false
+            },
+            onDismissRequest = {
+                showDialog = false
+            }
+        )
     }
 }

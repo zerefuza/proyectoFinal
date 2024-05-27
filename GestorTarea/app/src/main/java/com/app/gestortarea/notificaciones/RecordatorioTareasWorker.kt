@@ -24,6 +24,7 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
     private val db = FirebaseFirestore.getInstance()
 
     override suspend fun doWork(): Result {
+        var tareasPorFinalizar:Int=0;
         val usuarioId = inputData.getString("usuarioId") ?: return Result.failure()
 
         // Obtener tareas de Firebase
@@ -32,11 +33,15 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         // Verificar si alguna tarea está a punto de finalizar
         for (tarea in tareas) {
             if (isTareaPorFinalizar(tarea)) {
-                // Mostrar notificación
-                mostrarNotificacion(tarea)
+                tareasPorFinalizar++;
             }
         }
 
+        if (tareasPorFinalizar>0){
+            mostrarNotificacion(tareasPorFinalizar)
+        }
+
+        tareasPorFinalizar=0;
         return Result.success()
     }
 
@@ -76,7 +81,7 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         return diff in 0..oneDayInMillis
     }
 
-    private fun mostrarNotificacion(tarea: Tarea) {
+    private fun mostrarNotificacion(numeroDeTareas: Int) {
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -94,17 +99,23 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
             applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val contentText = if (numeroDeTareas == 1) {
+            "Tienes una tarea que está por finalizar"
+        } else {
+            "Tienes $numeroDeTareas tareas que están por finalizar"
+        }
+
         val notification = NotificationCompat.Builder(applicationContext, "TASK_REMINDER_CHANNEL")
-            .setContentTitle("Tarea por finalizar")
-            .setContentText("La tarea ${tarea.nombre} está por finalizar")
+            .setContentTitle("Tareas por finalizar")
+            .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .build()
 
-        Log.d("notificacion", "se lanza la notificacion"+notification)
-        notificationManager.notify(tarea.nombre.hashCode(), notification)
+        Log.d("notificacion", "Se lanza la notificación: $notification")
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }
 

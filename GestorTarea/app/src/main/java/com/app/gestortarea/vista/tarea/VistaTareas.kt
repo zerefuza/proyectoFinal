@@ -62,7 +62,7 @@ import java.util.Locale
 fun VistaTareas(
     navController: NavController,
     sharedViewModel: SharedViewModel
-){
+) {
     MyNavBar.Content(navController, sharedViewModel) { navController, sharedViewModel ->
         ContenidoVistaTareas(navController, sharedViewModel)
     }
@@ -75,7 +75,8 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
     var tareasMuyUrgentes by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasPasadas by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasCompletadas by remember { mutableStateOf(emptyList<Tarea>()) }
-    val urgenciaOptions = listOf("todos","muy urgente", "urgente", "poco urgente","pasadas","completadas")
+    val urgenciaOptions =
+        listOf("todos", "muy urgente", "urgente", "poco urgente", "pasadas", "completadas")
     var expanded by remember { mutableStateOf(false) }
     var opcionFiltro by remember { mutableStateOf(urgenciaOptions.first()) }
 
@@ -83,7 +84,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         sharedViewModel.obtenerTareas(sharedViewModel.userEmail.value) { tareasObtenidas ->
             tareasPasadas = obtenerTareasPorUrgencia(tareasObtenidas, "PASADAS")
             tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "POCO_URGENTE")
-            tareasUrgentes  = obtenerTareasPorUrgencia(tareasObtenidas, "URGENTE")
+            tareasUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "URGENTE")
             tareasMuyUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "MUY_URGENTE")
             tareasCompletadas = obtenerTareasPorUrgencia(tareasObtenidas, "COMPLETADAS")
         }
@@ -99,7 +100,11 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
             ) {
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
-                        imageVector = if(opcionFiltro=="todos"){Icons.Default.FilterAlt}else{Icons.Default.FilterAltOff},
+                        imageVector = if (opcionFiltro == "todos") {
+                            Icons.Default.FilterAlt
+                        } else {
+                            Icons.Default.FilterAltOff
+                        },
                         contentDescription = "Filtros"
                     )
                 }
@@ -122,45 +127,77 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         }
 
         //columnas de tareas
-        if (opcionFiltro=="todos" || opcionFiltro=="muy urgente"){
+        if (opcionFiltro == "todos" || opcionFiltro == "muy urgente") {
             item {
-                Text(text = "Muy Urgentes", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                Text(
+                    text = "Muy Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
                 if (tareasMuyUrgentes.isNotEmpty()) {
-                    TareaGrupo(tareas = tareasMuyUrgentes, navController, sharedViewModel,"muy urgente")
+                    TareaGrupo(
+                        tareas = tareasMuyUrgentes,
+                        navController,
+                        sharedViewModel,
+                    )
                 }
             }
         }
 
-        if (opcionFiltro=="todos" || opcionFiltro=="urgente"){
+        if (opcionFiltro == "todos" || opcionFiltro == "urgente") {
             item {
-                Text(text = "Urgentes", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                Text(
+                    text = "Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
                 if (tareasUrgentes.isNotEmpty()) {
-                    TareaGrupo(tareas = tareasUrgentes, navController, sharedViewModel,"urgente")
+                    TareaGrupo(tareas = tareasUrgentes, navController, sharedViewModel)
                 }
             }
         }
 
-        if (opcionFiltro=="todos" || opcionFiltro=="poco urgente"){
+        if (opcionFiltro == "todos" || opcionFiltro == "poco urgente") {
             item {
-                Text(text = "Poco Urgentes", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                Text(
+                    text = "Poco Urgentes",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
                 if (tareasPocoUrgentes.isNotEmpty()) {
-                    TareaGrupo(tareas = tareasPocoUrgentes, navController, sharedViewModel,"poco urgente")
+                    TareaGrupo(
+                        tareas = tareasPocoUrgentes,
+                        navController,
+                        sharedViewModel,
+                    )
                 }
             }
         }
-        if (opcionFiltro=="todos" || opcionFiltro=="pasadas"){
+        if (opcionFiltro == "todos" || opcionFiltro == "pasadas") {
             item {
-                Text(text = "Tareas Pasadas de fecha", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                Text(
+                    text = "Tareas Pasadas de fecha",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
                 if (tareasPasadas.isNotEmpty()) {
-                    TareaGrupo(tareas = tareasPasadas, navController, sharedViewModel,"pasadas")
+                    TareaGrupo(tareas = tareasPasadas, navController, sharedViewModel)
                 }
             }
         }
-        if (opcionFiltro=="todos" || opcionFiltro=="completadas"){
+        if (opcionFiltro == "todos" || opcionFiltro == "completadas") {
             item {
-                Text(text = "Tareas Completadas", fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp))
+                Text(
+                    text = "Tareas Completadas",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
                 if (tareasCompletadas.isNotEmpty()) {
-                    TareaGrupo(tareas = tareasCompletadas, navController, sharedViewModel,"completadas")
+                    TareaGrupo(
+                        tareas = tareasCompletadas,
+                        navController,
+                        sharedViewModel,
+                    )
                 }
             }
         }
@@ -173,7 +210,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         verticalAlignment = Alignment.Bottom
     ) {
         FloatingActionButton(
-            onClick = {navController.navigate(Vistas.VistaTareasAgregar.route)},
+            onClick = { navController.navigate(Vistas.VistaTareasAgregar.route) },
             modifier = Modifier
                 .padding(16.dp),
             containerColor = Color(0xFF42A5F5)
@@ -188,7 +225,11 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
 
 @Composable
-fun TareaGrupo(tareas: List<Tarea>, navController: NavController, sharedViewModel: SharedViewModel,tipo:String) {
+fun TareaGrupo(
+    tareas: List<Tarea>,
+    navController: NavController,
+    sharedViewModel: SharedViewModel,
+) {
     Box(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
@@ -196,25 +237,27 @@ fun TareaGrupo(tareas: List<Tarea>, navController: NavController, sharedViewMode
     }
     LazyRow {
         items(tareas) { tarea ->
-            TareaRow(tarea = tarea, navController, sharedViewModel,tipo)
+            TareaRow(tarea = tarea, navController, sharedViewModel)
         }
     }
 }
 
 @Composable
-fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: SharedViewModel, tipo: String) {
+fun TareaRow(
+    tarea: Tarea,
+    navController: NavController,
+    sharedViewModel: SharedViewModel,
+) {
     val cardColor = obtenerColorPorTiempoRestante(tarea)
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                if (!tarea.completada) {
-                    sharedViewModel.setTituloTarea(tarea.nombre)
-                    navController.navigate(Vistas.VistaTareasModificar.route)
-                }
+                sharedViewModel.setTituloTarea(tarea.nombre)
+                navController.navigate(Vistas.VistaTareasModificar.route)
             },
-        colors =CardDefaults.cardColors(cardColor?: Color.White),
+        colors = CardDefaults.cardColors(cardColor ?: Color.White),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -240,7 +283,10 @@ fun TareaRow(tarea: Tarea, navController: NavController, sharedViewModel: Shared
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault()).format(tarea.fecha),
+                    text = SimpleDateFormat(
+                        "dd-MM-yyyy hh:mm a",
+                        Locale.getDefault()
+                    ).format(tarea.fecha),
                     style = TextStyle(fontSize = 14.sp),
                 )
             }

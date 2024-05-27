@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.app.gestortarea.componentes.botonEnvio
+import com.app.gestortarea.componentes.enableTarea
 import com.app.gestortarea.componentes.navBar.MyNavBar
 import com.app.gestortarea.componentes.obtenerColorPorTiempoRestante
 import com.app.gestortarea.modeloDatos.Tarea
@@ -126,7 +127,7 @@ fun ContenidoVistaCalendario(navController: NavController, sharedViewModel: Shar
             botonEnvio(
                 "Crear tarea",
                 "normal",
-                inputValido = true
+                inputValido = enableTarea(fecha,selectedDate)
             ) {
                 sharedViewModel.setFechaTarea(selectedDate)
                 navController.navigate(Vistas.VistaTareasAgregar.route)
@@ -148,15 +149,13 @@ fun ContenidoVistaCalendario(navController: NavController, sharedViewModel: Shar
 fun TareaItem(tarea: Tarea, navController: NavController, sharedViewModel: SharedViewModel) {
     val cardColor = obtenerColorPorTiempoRestante(tarea)
     Card(
-        colors =CardDefaults.cardColors(cardColor?: Color.White),
+        colors = CardDefaults.cardColors(cardColor ?: Color.White),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                if (!tarea.completada) {
-                    sharedViewModel.setTituloTarea(tarea.nombre)
-                    navController.navigate(Vistas.VistaTareasModificar.route)
-                }
+                sharedViewModel.setTituloTarea(tarea.nombre)
+                navController.navigate(Vistas.VistaTareasModificar.route)
             }
     ) {
         Column(
