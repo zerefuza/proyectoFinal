@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 //metodo para habilitar el boton de login
 fun enableLogin(email: String, password: String): Boolean {
     val emailPattern = Pattern.compile("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+")
-    return emailPattern.matcher(email).matches() && password.length > 7
+    return emailPattern.matcher(email).matches() && password.trim().isNotEmpty()
 }
 
 //metodo para habilitar el boton de registro
@@ -20,17 +20,19 @@ fun enableRegistro(
     password: String,
     passwordConfirmacion:String
 ): Boolean {
+    val passwordPattern = Pattern.compile(
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$"
+    )
     val emailPattern = Pattern.compile("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+")
-    return emailPattern.matcher(email)
-        .matches() && password.length > 7 && nombre.isNotEmpty() && apellido.isNotEmpty() && day.isNotEmpty() && mes.isNotEmpty() && anio.isNotEmpty() && passwordConfirmacion.isNotEmpty()
+    return emailPattern.matcher(email).matches() && passwordPattern.matcher(password).matches() && nombre.isNotEmpty() && apellido.isNotEmpty() && day.isNotEmpty() && mes.isNotEmpty() && anio.isNotEmpty() && passwordConfirmacion.isNotEmpty()
 }
 
 // Método para habilitar el botón de registrar/modificar tarea
 fun enableTarea(titulo: String, fecha: Date?): Boolean {
-    return titulo.isNotEmpty() && fecha != null && fecha.after(Date())
+    val tituloValido = titulo.trim().isNotEmpty() && titulo.matches(Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9 ]+$"))
+    return tituloValido && fecha != null && fecha.after(Date())
 }
 
-// Método para habilitar el botón de registrar/modificar tarea
-fun enableTareaMarcarHecha(titulo: String): Boolean {
-    return titulo.isNotEmpty()
+fun enableTareaPorCalendario(fecha: Date?): Boolean {
+    return fecha != null && fecha.after(Date())
 }

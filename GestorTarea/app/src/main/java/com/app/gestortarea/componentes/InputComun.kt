@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -18,7 +17,7 @@ fun InputComun(
     onvalueChange: (String) -> Unit
 ) {
 
-    Column() {
+    Column {
         Text(text = titulo,
             modifier = Modifier.padding(bottom = 10.dp, start = 25.dp)
         )

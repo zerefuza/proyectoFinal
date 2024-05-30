@@ -5,13 +5,14 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.app.gestortarea.MainActivity
 import com.app.gestortarea.R
+import com.app.gestortarea.log.FileLogger
 import com.app.gestortarea.modeloDatos.Tarea
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -24,7 +25,7 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
     private val db = FirebaseFirestore.getInstance()
 
     override suspend fun doWork(): Result {
-        var tareasPorFinalizar:Int=0;
+        var tareasPorFinalizar:Int=0
         val usuarioId = inputData.getString("usuarioId") ?: return Result.failure()
 
         // Obtener tareas de Firebase
@@ -33,7 +34,7 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         // Verificar si alguna tarea está a punto de finalizar
         for (tarea in tareas) {
             if (isTareaPorFinalizar(tarea)) {
-                tareasPorFinalizar++;
+                tareasPorFinalizar++
             }
         }
 
@@ -41,14 +42,12 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
             mostrarNotificacion(tareasPorFinalizar)
         }
 
-        tareasPorFinalizar=0;
         return Result.success()
     }
 
     private suspend fun obtenerTareasDesdeFirebase(usuarioId: String): List<Tarea> {
         return suspendCancellableCoroutine { continuation ->
             obtenerTareas(usuarioId) { tareas ->
-                Log.d("notificacion", "obtenida las tareas: "+tareas.size)
                 continuation.resume(tareas)
             }
         }
@@ -68,7 +67,6 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
                 onComplete(tareas)
             }
             .addOnFailureListener { e ->
-                Log.d("notificacion", "Error al obtener tareas del usuario", e)
                 onComplete(emptyList())
             }
     }
@@ -114,7 +112,6 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
             .setAutoCancel(true)
             .build()
 
-        Log.d("notificacion", "Se lanza la notificación: $notification")
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }

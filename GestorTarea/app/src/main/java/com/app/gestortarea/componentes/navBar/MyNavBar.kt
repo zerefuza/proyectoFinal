@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
@@ -48,7 +49,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.work.WorkManager
@@ -150,7 +150,7 @@ fun MyTopBarUser(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Gestor de tareas"
+                    text = ""
                 )
             }
         }
@@ -213,7 +213,7 @@ fun MyDrawerContentUser(
 
             DrawerItem(
                 text = "Cerrar sesión",
-                icon = Icons.Default.Logout
+                icon = Icons.AutoMirrored.Filled.Logout
             ) {
                 with(sharedPreferences.edit()) {
                     remove("user_email")
@@ -221,6 +221,8 @@ fun MyDrawerContentUser(
                     apply()
                 }
                 WorkManager.getInstance(context).cancelUniqueWork("TaskReminderWork")
+
+                navController.popBackStack(navController.graph.startDestinationId, false)
                 navController.navigate(Vistas.LoginVista.route)
             }
         }

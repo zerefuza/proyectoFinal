@@ -10,9 +10,9 @@ fun programarTareasRecordatorias(context: Context, usuarioId: String) {
     val workManager = WorkManager.getInstance(context)
     val data = Data.Builder().putString("usuarioId", usuarioId).build()
     val periodicRefreshRequest = PeriodicWorkRequest.Builder(
-        RecordatorioTareasWorker::class.java, // Your worker class
-        15, // repeating interval
-        TimeUnit.MINUTES
+        RecordatorioTareasWorker::class.java,
+        3,
+        TimeUnit.HOURS
     ).setInputData(data).build()
 
     workManager.enqueueUniquePeriodicWork(

@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.app.gestortarea.viewModel.SharedViewModel
 import com.app.gestortarea.vista.InicioSplashVista
 import com.app.gestortarea.vista.LoginVista
-import com.app.gestortarea.vista.RecuperarContraseñaVista
+import com.app.gestortarea.vista.RecuperarContraseniaVista
 import com.app.gestortarea.vista.RegistroUsuarioVista
 import com.app.gestortarea.vista.calendaria.VistaCalendario
 import com.app.gestortarea.vista.tarea.VistaTareas
@@ -96,9 +96,9 @@ fun NavGraph(
 
         //recuper contraseña
         composable(
-            route = Vistas.RecuperarContraseñaVista.route
+            route = Vistas.RecuperarContraseniaVista.route
         ) {
-            RecuperarContraseñaVista(
+            RecuperarContraseniaVista(
                 navController = navController,
                 sharedViewModel = sharedViewModel
             )

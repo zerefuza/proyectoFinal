@@ -13,19 +13,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.gestortarea.componentes.InputComun
 import com.app.gestortarea.componentes.MiDatePicker
+import com.app.gestortarea.componentes.PopUpInformacion
 import com.app.gestortarea.componentes.botonEnvio
 import com.app.gestortarea.componentes.enableTarea
 import com.app.gestortarea.componentes.navBar.MyNavBar
@@ -47,10 +48,12 @@ fun VistaTareasAgregar(
 
 @Composable
 fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: SharedViewModel) {
+    val context = LocalContext.current
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fechaFin by remember { mutableStateOf<Date?>(null) }
     var error by remember { mutableStateOf("") }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -113,40 +116,44 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                 inputValido = enableTarea(titulo, fechaFin),
             ) {
                 sharedViewModel.obtenerTareaPorTitulo(
+                    context,
                     sharedViewModel.userEmail.value,
                     titulo = titulo
                 ) { tareaObtenida ->
                     if (tareaObtenida == null) {
                         if (fechaFin != null) {
-                            error = ""
                             val tareaData = Tarea(
                                 nombre = titulo,
                                 descripcion = descripcion,
                                 fecha = fechaFin
                             )
                             sharedViewModel.agregarTarea(
+                                context,
                                 sharedViewModel.userEmail.value,
                                 tareaData
                             ){
                                 sharedViewModel.setFechaTarea(null)
                                 navController.navigate(Vistas.VistaTareas.route)
                             }
+                        }else{
+                            showDialog=true
+                            error = "Error en la fecha de la tarea"
                         }
                     } else {
+                        showDialog=true
                         error = "El título de la tarea ya existe"
                     }
                 }
             }
-
-            // Mostrar error si existe
-            if (error.isNotEmpty()) {
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
         }
+    }
+    if (showDialog){
+        PopUpInformacion(
+            titulo = "Error",
+            descripcion = error,
+            onSuccess = { showDialog = false },
+            onDismissRequest = {showDialog = false}
+        )
     }
 }
 

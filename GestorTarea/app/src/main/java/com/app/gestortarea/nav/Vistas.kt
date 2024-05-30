@@ -8,6 +8,6 @@ sealed class Vistas(val route:String) {
     object  VistaTareasAgregar:Vistas(route="vista_tareas_agregar")
     object  VistaTareasModificar:Vistas(route="vista_tareas_modificar")
     object  VistaCalendario:Vistas(route="vista_calendario")
-    object  RecuperarContraseñaVista:Vistas(route="recuperar_contraseña_vista")
+    object  RecuperarContraseniaVista:Vistas(route="recuperar_contrasenia_vista")
 
 }

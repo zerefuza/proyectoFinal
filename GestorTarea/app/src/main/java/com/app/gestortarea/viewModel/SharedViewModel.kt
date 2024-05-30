@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.gestortarea.log.FileLogger
 import com.app.gestortarea.modeloDatos.Tarea
 import com.app.gestortarea.modeloDatos.Usuario
 import com.app.gestortarea.notificaciones.programarTareasRecordatorias
@@ -61,7 +61,7 @@ class SharedViewModel : ViewModel() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.d("Login", "Logueo del usuario $email exitoso")
+                            FileLogger.logToFile(context, "Login", "Logueo del usuario $email exitoso")
 
                             val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                             with(sharedPreferences.edit()) {
@@ -75,15 +75,12 @@ class SharedViewModel : ViewModel() {
                             // Llama a programarTareasRecordatorias después del inicio de sesión exitoso
                             programarTareasRecordatorias(context, email)
                         } else {
-                            Log.d(
-                                "Login",
-                                "Error, en el logueo del usuario $email: ${task.exception?.message}"
-                            )
+                            FileLogger.logToFile(context, "Login", "Error, en el logueo del usuario $email: ${task.exception?.message}")
                             onError("Credenciales inválidas. Por favor, inténtalo de nuevo.")
                         }
                     }
             } catch (ex: Exception) {
-                Log.d("Login", "Error al iniciar sesión: ${ex.message}")
+                FileLogger.logToFile(context, "Login", "Error al iniciar sesión: ${ex.message}")
                 onError("Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.")
             }
         }
@@ -110,21 +107,21 @@ class SharedViewModel : ViewModel() {
     }
 
     //agregar usuarios a la DB
-    fun agregarUsuario(usuario: Usuario) {
+    fun agregarUsuario(context: Context,usuario: Usuario) {
         val collectionRef = db.collection("usuarios")
         val documentRef = collectionRef.document(usuario.email)
 
         documentRef.set(usuario)
             .addOnSuccessListener {
-                Log.d("Firestore", "Usuario agregado con ID: ${usuario.email}")
+                FileLogger.logToFile(context, "Firestore", "Usuario agregado con ID: ${usuario.email}")
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al agregar usuario", e)
+                FileLogger.logToFile(context, "Firestore", "Error al agregar usuario: ${e.message}")
             }
     }
 
     //agregar tareas
-    fun agregarTarea(usuarioId: String, tarea: Tarea,onSuccess: () -> Unit) {
+    fun agregarTarea(context: Context,usuarioId: String, tarea: Tarea,onSuccess: () -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
         // Verificar si la subcolección de tareas ya existe
@@ -135,39 +132,39 @@ class SharedViewModel : ViewModel() {
                     usuarioDocRef.collection("tareas").document(tarea.nombre).set(tarea)
                         .addOnSuccessListener {
                             // Después de crear el documento inicial, agregar la tarea
-                            Log.d("Firestore", "se ha creado el documento inicial de tareas")
+                            FileLogger.logToFile(context, "Firestore", "Se ha creado el documento inicial de tareas")
                             onSuccess()
                         }
                         .addOnFailureListener { e ->
-                            Log.w("Firestore", "Error al crear el documento inicial de tareas", e)
+                            FileLogger.logToFile(context, "Firestore", "Error al crear el documento inicial de tareas: ${e.message}")
                         }
                 } else {
                     // Si la subcolección de tareas ya existe, agregar la tarea directamente
-                    agregarTareaReal(usuarioDocRef, tarea){
+                    agregarTareaReal(context,usuarioDocRef, tarea){
                         onSuccess()
                     }
                 }
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al obtener la subcolección de tareas del usuario", e)
+                FileLogger.logToFile(context, "Firestore", "Error al obtener la subcolección de tareas del usuario: ${e.message}")
             }
     }
 
-    private fun agregarTareaReal(usuarioDocRef: DocumentReference, tarea: Tarea,onSuccess: () -> Unit) {
+    private fun agregarTareaReal(context: Context,usuarioDocRef: DocumentReference, tarea: Tarea,onSuccess: () -> Unit) {
         val documentRef = usuarioDocRef.collection("tareas").document(tarea.nombre)
 
         documentRef.set(tarea)
             .addOnSuccessListener { documentReference ->
                 onSuccess()
-                Log.d("Firestore", "Tarea agregada con exito")
+                FileLogger.logToFile(context, "Firestore", "Tarea agregada con éxito")
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al agregar tarea para el usuario", e)
+                FileLogger.logToFile(context, "Firestore", "Error al agregar tarea para el usuario: ${e.message}")
             }
     }
 
     //modificar tarea
-    fun modificarTarea(usuarioId: String, tituloAntiguo: String, tarea: Tarea,onSuccess: () -> Unit) {
+    fun modificarTarea(context: Context,usuarioId: String, tituloAntiguo: String, tarea: Tarea,onSuccess: () -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
         val tareaAntiguaDocRef = usuarioDocRef.collection("tareas").document(tituloAntiguo)
 
@@ -177,35 +174,35 @@ class SharedViewModel : ViewModel() {
                     // Si el documento de la tarea antigua existe, elimínalo
                     tareaAntiguaDocRef.delete()
                         .addOnSuccessListener {
-                            Log.d("Firestore", "Tarea antigua eliminada con éxito")
+                            FileLogger.logToFile(context, "Firestore", "Tarea antigua eliminada con éxito")
 
                             // Después de eliminar el documento antiguo, agregar el documento con el nuevo título
                             val nuevaTareaDocRef = usuarioDocRef.collection("tareas").document(tarea.nombre)
                             nuevaTareaDocRef.set(tarea)
                                 .addOnSuccessListener {
-                                    Log.d("Firestore", "Tarea modificada con éxito")
+                                    FileLogger.logToFile(context, "Firestore", "Tarea modificada con éxito")
                                     onSuccess()
                                 }
                                 .addOnFailureListener { e ->
-                                    Log.w("Firestore", "Error al agregar la tarea con el nuevo título", e)
+                                    FileLogger.logToFile(context, "Firestore", "Error al agregar la tarea con el nuevo título: ${e.message}")
                                 }
                         }
                         .addOnFailureListener { e ->
-                            Log.w("Firestore", "Error al eliminar la tarea antigua", e)
+                            FileLogger.logToFile(context, "Firestore", "Error al eliminar la tarea antigua: ${e.message}")
                         }
                 } else {
                     // Si el documento de la tarea antigua no existe, registrar el error
-                    Log.w("Firestore", "La tarea antigua no existe y no se puede modificar")
+                    FileLogger.logToFile(context, "Firestore", "La tarea antigua no existe y no se puede modificar")
                 }
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al obtener el documento de la tarea antigua", e)
+                FileLogger.logToFile(context, "Firestore", "Error al obtener el documento de la tarea antigua: ${e.message}")
             }
     }
 
 
     //Recuperar todas las tareas
-    fun obtenerTareas(usuarioId: String, onComplete: (List<Tarea>) -> Unit) {
+    fun obtenerTareas(context: Context,usuarioId: String, onComplete: (List<Tarea>) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
         usuarioDocRef.collection("tareas").get()
@@ -218,13 +215,13 @@ class SharedViewModel : ViewModel() {
                 onComplete(tareas)
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al obtener tareas del usuario", e)
+                FileLogger.logToFile(context, "Firestore", "Error al obtener tareas del usuario: ${e.message}")
                 onComplete(emptyList())
             }
     }
 
     //recuperar una tarea por titulo
-    fun obtenerTareaPorTitulo(usuarioId: String, titulo: String, onComplete: (Tarea?) -> Unit) {
+    fun obtenerTareaPorTitulo(context: Context,usuarioId: String, titulo: String, onComplete: (Tarea?) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
         usuarioDocRef.collection("tareas")
@@ -235,13 +232,13 @@ class SharedViewModel : ViewModel() {
                 onComplete(tarea)
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al obtener tarea por título", e)
+                FileLogger.logToFile(context, "Firestore", "Error al obtener tarea por título: ${e.message}")
                 onComplete(null)
             }
     }
 
     //borrar tarea
-    fun borrarTareasPorTitulo(usuarioId: String, titulo: String, onComplete: (Boolean) -> Unit) {
+    fun borrarTareasPorTitulo(context: Context,usuarioId: String, titulo: String, onComplete: (Boolean) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
         // Consultar las tareas con el título especificado
@@ -259,17 +256,17 @@ class SharedViewModel : ViewModel() {
                         onComplete(true) // Éxito al eliminar las tareas
                     }
                     .addOnFailureListener { e ->
-                        Log.w("Firestore", "Error al eliminar tareas por título", e)
+                        FileLogger.logToFile(context, "Firestore", "Error al eliminar tareas por título: ${e.message}")
                         onComplete(false) // Error al eliminar las tareas
                     }
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error al obtener tareas por título", e)
+                FileLogger.logToFile(context, "Firestore", "Error al obtener tareas por título: ${e.message}")
                 onComplete(false) // Error al obtener las tareas
             }
     }
 
-    fun emailRecuperacionContraseña(email: String, onSuccess: () -> Unit,onError: () -> Unit) {
+    fun emailRecuperacionContrasenia(email: String, onSuccess: () -> Unit,onError: () -> Unit) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener{
                 if (it.isSuccessful){

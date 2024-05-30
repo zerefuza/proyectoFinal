@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,13 +49,11 @@ import androidx.navigation.NavController
 import com.app.gestortarea.componentes.navBar.MyNavBar
 import com.app.gestortarea.componentes.obtenerColorPorTiempoRestante
 import com.app.gestortarea.componentes.obtenerTareasPorUrgencia
+import com.app.gestortarea.modeloDatos.NivelUrgencia
 import com.app.gestortarea.modeloDatos.Tarea
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
@@ -70,23 +68,23 @@ fun VistaTareas(
 
 @Composable
 fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedViewModel) {
+    val context = LocalContext.current
     var tareasUrgentes by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasPocoUrgentes by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasMuyUrgentes by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasPasadas by remember { mutableStateOf(emptyList<Tarea>()) }
     var tareasCompletadas by remember { mutableStateOf(emptyList<Tarea>()) }
-    val urgenciaOptions =
-        listOf("todos", "muy urgente", "urgente", "poco urgente", "pasadas", "completadas")
+    val urgenciaOptions = listOf("TODOS", NivelUrgencia.MUY_URGENTE.valor, NivelUrgencia.URGENTE.valor, NivelUrgencia.POCO_URGENTE.valor, NivelUrgencia.PASADAS.valor, NivelUrgencia.COMPLETADAS.valor)
     var expanded by remember { mutableStateOf(false) }
     var opcionFiltro by remember { mutableStateOf(urgenciaOptions.first()) }
 
     LaunchedEffect(Unit) {
-        sharedViewModel.obtenerTareas(sharedViewModel.userEmail.value) { tareasObtenidas ->
-            tareasPasadas = obtenerTareasPorUrgencia(tareasObtenidas, "PASADAS")
-            tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "POCO_URGENTE")
-            tareasUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "URGENTE")
-            tareasMuyUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, "MUY_URGENTE")
-            tareasCompletadas = obtenerTareasPorUrgencia(tareasObtenidas, "COMPLETADAS")
+        sharedViewModel.obtenerTareas(context,sharedViewModel.userEmail.value) { tareasObtenidas ->
+            tareasPasadas = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.PASADAS.valor)
+            tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.POCO_URGENTE.valor)
+            tareasUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.URGENTE.valor)
+            tareasMuyUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.MUY_URGENTE.valor)
+            tareasCompletadas = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.COMPLETADAS.valor)
         }
     }
 
@@ -100,7 +98,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
             ) {
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
-                        imageVector = if (opcionFiltro == "todos") {
+                        imageVector = if (opcionFiltro == "TODOS") {
                             Icons.Default.FilterAlt
                         } else {
                             Icons.Default.FilterAltOff
@@ -127,7 +125,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         }
 
         //columnas de tareas
-        if (opcionFiltro == "todos" || opcionFiltro == "muy urgente") {
+        if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.MUY_URGENTE.valor) {
             item {
                 Text(
                     text = "Muy Urgentes",
@@ -144,7 +142,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
             }
         }
 
-        if (opcionFiltro == "todos" || opcionFiltro == "urgente") {
+        if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.URGENTE.valor) {
             item {
                 Text(
                     text = "Urgentes",
@@ -157,7 +155,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
             }
         }
 
-        if (opcionFiltro == "todos" || opcionFiltro == "poco urgente") {
+        if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.POCO_URGENTE.valor) {
             item {
                 Text(
                     text = "Poco Urgentes",
@@ -173,7 +171,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
                 }
             }
         }
-        if (opcionFiltro == "todos" || opcionFiltro == "pasadas") {
+        if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.PASADAS.valor) {
             item {
                 Text(
                     text = "Tareas Pasadas de fecha",
@@ -185,7 +183,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
                 }
             }
         }
-        if (opcionFiltro == "todos" || opcionFiltro == "completadas") {
+        if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.COMPLETADAS.valor) {
             item {
                 Text(
                     text = "Tareas Completadas",
@@ -257,7 +255,7 @@ fun TareaRow(
                 sharedViewModel.setTituloTarea(tarea.nombre)
                 navController.navigate(Vistas.VistaTareasModificar.route)
             },
-        colors = CardDefaults.cardColors(cardColor ?: Color.White),
+        colors = CardDefaults.cardColors(cardColor),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

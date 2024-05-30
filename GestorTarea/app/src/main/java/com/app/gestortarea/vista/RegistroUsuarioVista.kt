@@ -1,23 +1,15 @@
 package com.app.gestortarea.vista
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,8 +28,8 @@ import androidx.navigation.NavController
 import com.app.gestortarea.R
 import com.app.gestortarea.componentes.FechaNacimientoInput
 import com.app.gestortarea.componentes.InputComun
-import com.app.gestortarea.componentes.MiDatePicker
 import com.app.gestortarea.componentes.PasswordInput
+import com.app.gestortarea.componentes.PopUpInformacion
 import com.app.gestortarea.componentes.botonEnvio
 import com.app.gestortarea.componentes.enableRegistro
 import com.app.gestortarea.modeloDatos.Tarea
@@ -55,6 +47,7 @@ fun RegistroUsuarioVista(
     sharedViewModel: SharedViewModel
 ) {
     // Propiedades
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var nombre by remember { mutableStateOf("") }
     var fechaNacimiento by remember { mutableStateOf<Date?>(null) }
@@ -76,8 +69,9 @@ fun RegistroUsuarioVista(
         null
     }
 
-    // Métodos
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Métodos
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
@@ -135,7 +129,7 @@ fun RegistroUsuarioVista(
 
             // Contraseña
             PasswordInput(
-                titulo = "Password: ",
+                titulo = "Password (1 minúscula, 1 mayúscula, 1 digito, 1 carácter especial, longitud de 8 caracteres): ",
                 password = password,
                 onPasswordChange = { newPassword -> password = newPassword },
                 passwordVisible = passwordVisible,
@@ -154,8 +148,6 @@ fun RegistroUsuarioVista(
                     confirmPasswordVisible = !confirmPasswordVisible
                 },
             )
-            Text(text = errorMensaje, color = Color.Red)
-
             // Botón de envío
             botonEnvio(
                 "Registrar",
@@ -194,19 +186,22 @@ fun RegistroUsuarioVista(
                                     fecha = Calendar.getInstance().time
                                 )
 
-                                sharedViewModel.agregarUsuario(userData)
-                                sharedViewModel.agregarTarea(userData.email, tareaData){
+                                sharedViewModel.agregarUsuario(context,userData)
+                                sharedViewModel.agregarTarea(context,userData.email, tareaData) {
                                     navController.navigate(Vistas.LoginVista.route)
                                 }
                             },
                             onError = { errorMessage ->
+                                showDialog = true
                                 errorMensaje = errorMessage
                             }
                         )
                     } else {
+                        showDialog = true
                         errorMensaje = "Invalid password"
                     }
                 } else {
+                    showDialog = true
                     errorMensaje = "La fecha de nacimiento es invalida"
                 }
             }
@@ -231,6 +226,14 @@ fun RegistroUsuarioVista(
                 )
             }
         }
+    }
+    if (showDialog){
+        PopUpInformacion(
+            titulo = "Error",
+            descripcion = errorMensaje,
+            onSuccess = { showDialog = false },
+            onDismissRequest = {showDialog = false}
+        )
     }
 }
 
