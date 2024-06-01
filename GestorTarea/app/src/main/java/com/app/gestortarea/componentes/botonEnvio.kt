@@ -11,7 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-//componentes del boton de envio
+/**
+ * Componente composable que muestra un botón con diferentes estilos según el tipo.
+ *
+ * @param titulo El texto que se muestra en el botón.
+ * @param tipo El tipo de botón, puede ser "normal", "borrado" o "hecho".
+ * @param inputValido Indica si el botón debe estar habilitado o no.
+ * @param onClic La acción a realizar cuando se hace clic en el botón.
+ */
 @Composable
 fun botonEnvio(
     titulo:String,

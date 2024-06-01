@@ -7,6 +7,12 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
+/**
+ * Método para obtener el color de una tarea según el tiempo restante.
+ *
+ * @param tarea La tarea de la que se desea obtener el color.
+ * @return El color correspondiente a la tarea.
+ */
 fun obtenerColorPorTiempoRestante(tarea:Tarea): Color {
     val fechaTarea = tarea.fecha?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
 
@@ -19,10 +25,17 @@ fun obtenerColorPorTiempoRestante(tarea:Tarea): Color {
         horasRestantes >= 48 && !tarea.completada -> Color.Cyan
         horasRestantes < 0 && !tarea.completada -> Color.Gray
         tarea.completada -> Color.Green
-        else -> Color.Yellow
+        else -> Color.Red
     }
 }
 
+/**
+ * Método para filtrar una lista de tareas según su nivel de urgencia.
+ *
+ * @param tareas         La lista de tareas a filtrar.
+ * @param nivelUrgencia  El nivel de urgencia deseado.
+ * @return La lista de tareas filtrada por el nivel de urgencia especificado.
+ */
 fun obtenerTareasPorUrgencia(tareas: List<Tarea>, nivelUrgencia: String): List<Tarea> {
     return tareas.filter { tarea ->
         val fechaTarea = tarea.fecha?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()

@@ -41,6 +41,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Composable que representa la vista de registro de usuario.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun RegistroUsuarioVista(
     navController: NavController,
@@ -62,6 +68,7 @@ fun RegistroUsuarioVista(
     var month by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
 
+    // Parseo de la fecha de nacimiento a partir de day, month, year
     fechaNacimiento = try {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         dateFormat.parse("$day/$month/$year")
@@ -71,12 +78,13 @@ fun RegistroUsuarioVista(
 
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
-    // Métodos
+    // Vista de formulario de registro
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
     ) {
         item {
+            // Logo de la aplicación
             Icon(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "registrar",
@@ -85,7 +93,7 @@ fun RegistroUsuarioVista(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Email
+            // Campo de entrada de email
             InputComun(
                 titulo = "Email: ",
                 placeholder = "Email del usuario",
@@ -95,7 +103,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Nombre
+            // Campo de entrada de nombre
             InputComun(
                 titulo = "Nombre: ",
                 placeholder = "Nombre del usuario",
@@ -105,7 +113,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Apellidos
+            // Campo de entrada de apellidos
             InputComun(
                 titulo = "Apellidos: ",
                 placeholder = "Apellidos del usuario",
@@ -115,7 +123,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Fecha de nacimiento
+            // Campo de entrada de fecha de nacimiento
             FechaNacimientoInput(
                 day = day,
                 month = month,
@@ -127,7 +135,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Contraseña
+            // Campo de entrada de contraseña
             PasswordInput(
                 titulo = "Password (1 minúscula, 1 mayúscula, 1 digito, 1 carácter especial, longitud de 8 caracteres): ",
                 password = password,
@@ -138,7 +146,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Confirmar Contraseña
+            // Campo de entrada para confirmar la contraseña
             PasswordInput(
                 titulo = "Confirmar Password: ",
                 password = confirmPassword,
@@ -148,7 +156,8 @@ fun RegistroUsuarioVista(
                     confirmPasswordVisible = !confirmPasswordVisible
                 },
             )
-            // Botón de envío
+
+            // Botón de envío para registrar al usuario
             botonEnvio(
                 "Registrar",
                 "normal",
@@ -163,16 +172,17 @@ fun RegistroUsuarioVista(
                     confirmPassword
                 )
             ) {
-                fechaNacimiento = try {
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    dateFormat.parse("$day/$month/$year")
-                } catch (e: Exception) {
-                    null
-                }
+                // Revalidación de la fecha de nacimiento
+                fechaNacimiento =analizarFechaNacimiento(day,month,year)
+
                 if (fechaNacimiento != null) {
                     if (password == confirmPassword) {
+                        // Registro del usuario a través del ViewModel compartido
                         sharedViewModel.registrarUsuario(email, password,
                             onSuccess = {
+                                val fechaActual = Calendar.getInstance()
+                                fechaActual.add(Calendar.HOUR_OF_DAY, 24)
+
                                 val userData = Usuario(
                                     nombre = nombre,
                                     apellido = apellidos,
@@ -183,11 +193,12 @@ fun RegistroUsuarioVista(
                                 val tareaData = Tarea(
                                     nombre = "Tarea Inicial",
                                     descripcion = "Tarea Inicial",
-                                    fecha = Calendar.getInstance().time
+                                    fecha = fechaActual.time
                                 )
 
-                                sharedViewModel.agregarUsuario(context,userData)
-                                sharedViewModel.agregarTarea(context,userData.email, tareaData) {
+                                // Agregar usuario y tarea inicial
+                                sharedViewModel.agregarUsuario(context, userData)
+                                sharedViewModel.agregarTarea(context, userData.email, tareaData) {
                                     navController.navigate(Vistas.LoginVista.route)
                                 }
                             },
@@ -208,7 +219,7 @@ fun RegistroUsuarioVista(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Apartado de login
+            // Sección de redirección a login
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -227,13 +238,47 @@ fun RegistroUsuarioVista(
             }
         }
     }
-    if (showDialog){
+
+    // Diálogo de error
+    if (showDialog) {
         PopUpInformacion(
             titulo = "Error",
             descripcion = errorMensaje,
             onSuccess = { showDialog = false },
-            onDismissRequest = {showDialog = false}
+            onDismissRequest = { showDialog = false }
         )
     }
 }
 
+/**
+ * Analiza una fecha de nacimiento representada por tres cadenas de texto (día, mes y año) y devuelve un objeto Date.
+ *
+ * @param day El día de nacimiento como cadena de texto.
+ * @param month El mes de nacimiento como cadena de texto.
+ * @param year El año de nacimiento como cadena de texto.
+ * @return El objeto Date que representa la fecha de nacimiento si las cadenas de texto son válidas y representan una fecha válida; de lo contrario, devuelve null.
+ */
+fun analizarFechaNacimiento(day: String, month: String, year: String): Date? {
+    try {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val fecha = "$day/$month/$year"
+        val fechaDate = dateFormat.parse(fecha)
+
+        // Verificar si la fecha analizada es igual a la fecha ingresada
+        val cal = Calendar.getInstance()
+        cal.time = fechaDate
+        val parsedDay = cal.get(Calendar.DAY_OF_MONTH).toString()
+        val parsedMonth = (cal.get(Calendar.MONTH) + 1).toString()
+        val parsedYear = cal.get(Calendar.YEAR).toString()
+
+        // Si los datos analizados son iguales a los ingresados, la fecha es válida
+        return if (parsedDay == day && parsedMonth == month && parsedYear == year) {
+            fechaDate
+        } else {
+            null // La fecha analizada no es igual a la fecha ingresada
+        }
+    } catch (e: Exception) {
+        // Error al analizar la fecha
+        return null
+    }
+}

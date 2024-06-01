@@ -35,6 +35,13 @@ import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import java.util.Date
 
+/**
+ * Composable que representa la vista para agregar nuevas tareas.
+ * Utiliza una barra de navegación personalizada y llama al contenido de la vista.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun VistaTareasAgregar(
     navController: NavController,
@@ -45,22 +52,33 @@ fun VistaTareasAgregar(
     }
 }
 
-
+/**
+ * Composable que contiene el contenido de la vista de agregar nuevas tareas.
+ * Permite agregar una nueva tarea, verificando que no exista una tarea con el mismo título.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: SharedViewModel) {
+    // Contexto actual de la aplicación
     val context = LocalContext.current
+
+    // Variables de estado para los campos de la tarea
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var fechaFin by remember { mutableStateOf<Date?>(null) }
+    var fechaFin by remember { mutableStateOf<Date?>(sharedViewModel.fechaTarea.value) }
     var error by remember { mutableStateOf("") }
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Contenido principal de la vista
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         item {
+            // Icono de retroceso
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
                 contentDescription = null,
@@ -69,6 +87,7 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                     .clickable { navController.navigate(Vistas.VistaTareas.route) }
             )
 
+            // Icono de agregar persona
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,8 +101,7 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                 )
             }
 
-
-            // Título
+            // Campo de entrada para el título
             InputComun(
                 titulo = "Título:",
                 placeholder = "Título",
@@ -91,8 +109,7 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                 onvalueChange = { value -> titulo = value },
             )
 
-
-            // Descripción
+            // Campo de entrada para la descripción
             InputComun(
                 titulo = "Descripción:",
                 placeholder = "Descripción",
@@ -100,13 +117,11 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                 onvalueChange = { value -> descripcion = value },
             )
 
-
-            // Fecha de fin
+            // Selector de fecha
             MiDatePicker(
                 onFechaSeleccionada = { fecha -> fechaFin = fecha },
-                fechaInicial = if(fechaFin==null){sharedViewModel.fechaTarea.value}else{fechaFin},
+                fechaInicial = fechaFin,
             )
-
 
             // Botón de envío
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,29 +146,30 @@ fun ContenidoVistaTareasAgregar(navController: NavController, sharedViewModel: S
                                 context,
                                 sharedViewModel.userEmail.value,
                                 tareaData
-                            ){
+                            ) {
                                 sharedViewModel.setFechaTarea(null)
                                 navController.navigate(Vistas.VistaTareas.route)
                             }
-                        }else{
-                            showDialog=true
+                        } else {
+                            showDialog = true
                             error = "Error en la fecha de la tarea"
                         }
                     } else {
-                        showDialog=true
+                        showDialog = true
                         error = "El título de la tarea ya existe"
                     }
                 }
             }
         }
     }
-    if (showDialog){
+
+    // Diálogo de información de error
+    if (showDialog) {
         PopUpInformacion(
             titulo = "Error",
             descripcion = error,
             onSuccess = { showDialog = false },
-            onDismissRequest = {showDialog = false}
+            onDismissRequest = { showDialog = false }
         )
     }
 }
-

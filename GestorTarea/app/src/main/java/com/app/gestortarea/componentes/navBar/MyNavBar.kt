@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Divider
@@ -55,10 +54,23 @@ import androidx.work.WorkManager
 import com.app.gestortarea.R
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Implementación de la interfaz NavBarInt para definir una barra de navegación personalizada.
+ */
 object MyNavBar : NavBarInt {
+    /**
+     * Método para mostrar el contenido de la barra de navegación personalizada.
+     *
+     * @param navController     El controlador de navegación.
+     * @param sharedViewModel   El modelo compartido.
+     * @param contenidoUser     El contenido de la barra de navegación personalizada.
+     */
     @Composable
     override fun Content(
         navController: NavController,
@@ -118,7 +130,9 @@ object MyNavBar : NavBarInt {
     }
 }
 
-
+/**
+ * Componente que representa la barra superior de la barra de navegación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTopBarUser(
@@ -157,13 +171,16 @@ fun MyTopBarUser(
     )
 }
 
-
+/**
+ * Componente que representa el contenido del cajón lateral de la barra de navegación.
+ */
 @Composable
 fun MyDrawerContentUser(
     navController: NavController,
     modifier: Modifier = Modifier,
     onBackPress: () -> Unit,
 ) {
+    val auth: FirebaseAuth = Firebase.auth
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val email = sharedPreferences.getString("user_email", null)
@@ -215,6 +232,7 @@ fun MyDrawerContentUser(
                 text = "Cerrar sesión",
                 icon = Icons.AutoMirrored.Filled.Logout
             ) {
+                auth.signOut()
                 with(sharedPreferences.edit()) {
                     remove("user_email")
                     putBoolean("is_logged_in", false)
@@ -232,6 +250,9 @@ fun MyDrawerContentUser(
     }
 }
 
+/**
+ * Componente que representa un elemento en el cajón lateral de la barra de navegación.
+ */
 @Composable
 fun DrawerItem(
     text: String,
@@ -257,7 +278,9 @@ fun DrawerItem(
     }
 }
 
-
+/**
+ * Componente que maneja el evento de retroceso en el cajón lateral de la barra de navegación.
+ */
 @Composable
 fun BackPressHandlerUser(enabled: Boolean = true, onBackPressed: () -> Unit) {
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)

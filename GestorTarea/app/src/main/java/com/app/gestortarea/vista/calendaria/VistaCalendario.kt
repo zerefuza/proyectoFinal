@@ -1,6 +1,5 @@
 package com.app.gestortarea.vista.calendaria
 
-import android.util.Log
 import android.widget.CalendarView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.app.gestortarea.componentes.botonEnvio
-import com.app.gestortarea.componentes.enableTarea
 import com.app.gestortarea.componentes.enableTareaPorCalendario
 import com.app.gestortarea.componentes.navBar.MyNavBar
 import com.app.gestortarea.componentes.obtenerColorPorTiempoRestante
@@ -41,17 +39,30 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Composable que representa la vista de calendario.
+ * Utiliza una barra de navegación personalizada y muestra el contenido de la vista de calendario.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun VistaCalendario(
     navController: NavController,
     sharedViewModel: SharedViewModel
 ) {
     MyNavBar.Content(navController, sharedViewModel) { navController, sharedViewModel ->
-        // Personaliza aquí el contenidoUser según sea necesario, utilizando navController y sharedViewModel
         ContenidoVistaCalendario(navController, sharedViewModel)
     }
 }
 
+/**
+ * Composable que contiene el contenido de la vista de calendario.
+ * Muestra un calendario integrado y las tareas filtradas por la fecha seleccionada.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun ContenidoVistaCalendario(navController: NavController, sharedViewModel: SharedViewModel) {
     var tareas by remember { mutableStateOf(emptyList<Tarea>()) }
@@ -71,6 +82,7 @@ fun ContenidoVistaCalendario(navController: NavController, sharedViewModel: Shar
             )
         }
     }
+    // Contenido principal de la vista
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -144,6 +156,13 @@ fun ContenidoVistaCalendario(navController: NavController, sharedViewModel: Shar
     }
 }
 
+/**
+ * Composable que representa una fila de tarea individual.
+ *
+ * @param tarea Tarea a mostrar.
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun TareaItem(tarea: Tarea, navController: NavController, sharedViewModel: SharedViewModel) {
     val cardColor = obtenerColorPorTiempoRestante(tarea)
@@ -173,4 +192,3 @@ fun TareaItem(tarea: Tarea, navController: NavController, sharedViewModel: Share
         }
     }
 }
-

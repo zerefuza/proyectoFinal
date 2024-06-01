@@ -19,6 +19,15 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.Alignment
 
+/**
+ * Componente composable que muestra un campo de entrada de contraseña.
+ *
+ * @param titulo                   El título del campo de entrada.
+ * @param password                 El valor actual de la contraseña.
+ * @param onPasswordChange         La acción a realizar cuando cambia la contraseña.
+ * @param passwordVisible          Indica si la contraseña debe mostrarse o no.
+ * @param onPasswordVisibilityToggle La acción para alternar la visibilidad de la contraseña.
+ */
 @Composable
 fun PasswordInput(
     titulo:String,

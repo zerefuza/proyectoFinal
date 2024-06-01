@@ -26,22 +26,28 @@ import com.app.gestortarea.R
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import kotlinx.coroutines.delay
-
+/**
+ * Composable que representa la vista de pantalla de bienvenida de la aplicación.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
-fun InicioSplashVista(navController: NavController,sharedViewModel: SharedViewModel){
+fun InicioSplashVista(navController: NavController, sharedViewModel: SharedViewModel) {
     val scale = remember { Animatable(0f) }
     val context = LocalContext.current
 
+    // Efecto lanzado una vez para la animación y la navegación
     LaunchedEffect(key1 = true) {
         val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
         val email = sharedPreferences.getString("user_email", null)
 
-        //animacion
+        // Animación de escalado con retardo
         scale.animateTo(
             targetValue = 0.9f,
             animationSpec = tween(
-                delayMillis = 2000,
+                durationMillis = 500,
                 easing = {
                     OvershootInterpolator(8f).getInterpolation(it)
                 }
@@ -49,6 +55,7 @@ fun InicioSplashVista(navController: NavController,sharedViewModel: SharedViewMo
         )
         delay(2000)
 
+        // Navegación basada en el estado de inicio de sesión
         if (isLoggedIn && email != null) {
             sharedViewModel.setuserEmail(email)
             navController.navigate(Vistas.VistaTareas.route)
@@ -56,6 +63,8 @@ fun InicioSplashVista(navController: NavController,sharedViewModel: SharedViewMo
             navController.navigate(Vistas.LoginVista.route)
         }
     }
+
+    // Disposición de la pantalla
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,17 +75,16 @@ fun InicioSplashVista(navController: NavController,sharedViewModel: SharedViewMo
                 .padding(15.dp)
                 .fillMaxSize()
                 .scale(scale.value)
-                .weight(1f)
-            ,
+                .weight(1f),
             color = Color.White,
         ) {
             Column(
                 modifier = Modifier
-                    .background(Color.White)
-                ,
+                    .background(Color.White),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Imagen del logo centrada
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "logo",

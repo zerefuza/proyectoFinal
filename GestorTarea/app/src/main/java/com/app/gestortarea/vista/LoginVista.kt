@@ -32,6 +32,12 @@ import com.app.gestortarea.componentes.enableLogin
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 
+/**
+ * Composable que representa la vista de inicio de sesión del usuario.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun LoginVista(
     navController: NavController,
@@ -44,11 +50,12 @@ fun LoginVista(
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    // Métodos
+    // Contenedor para la disposición de los elementos
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
+            // Imagen del logo
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "logo",
@@ -57,9 +64,9 @@ fun LoginVista(
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Usuario
+            // Campo de entrada de email
             InputComun(
-                titulo = "email:",
+                titulo = "Email:",
                 placeholder = "Email del usuario",
                 value = email,
                 onvalueChange = { newEmail -> email = newEmail },
@@ -67,7 +74,7 @@ fun LoginVista(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Contraseña
+            // Campo de entrada de contraseña
             PasswordInput(
                 titulo = "Password: ",
                 password = password,
@@ -90,8 +97,8 @@ fun LoginVista(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón de envío
-            botonEnvio("Login","normal", inputValido = enableLogin(email, password)) {
+            // Botón de envío para iniciar sesión
+            botonEnvio("Login", "normal", inputValido = enableLogin(email, password)) {
                 sharedViewModel.loginUsuario(email, password, context,
                     onSuccess = {
                         errorMensaje = ""
@@ -106,6 +113,7 @@ fun LoginVista(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Mostrar mensaje de error si hay alguno
             Text(text = errorMensaje, color = Color.Red)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,4 +139,3 @@ fun LoginVista(
         }
     }
 }
-

@@ -25,6 +25,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Componente composable que muestra un selector de fecha y hora.
+ *
+ * @param onFechaSeleccionada La acción a realizar cuando se selecciona una fecha y hora.
+ * @param fechaInicial La fecha y hora inicial del selector, si la hay.
+ */
 @Composable
 fun MiDatePicker(
     onFechaSeleccionada: (Date) -> Unit,

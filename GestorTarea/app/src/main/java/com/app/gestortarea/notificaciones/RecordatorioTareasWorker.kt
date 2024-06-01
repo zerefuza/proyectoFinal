@@ -20,10 +20,24 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
+/**
+ * Clase que representa un Worker para gestionar recordatorios de tareas.
+ * Este Worker realiza tareas en segundo plano, como verificar si alguna tarea está por finalizar y mostrar notificaciones de recordatorio.
+ *
+ * @param appContext El contexto de la aplicación.
+ * @param workerParams Los parámetros del Worker.
+ */
 class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
 
     private val db = FirebaseFirestore.getInstance()
 
+    /**
+     * Realiza el trabajo en segundo plano.
+     * En este método, se obtienen las tareas del usuario desde Firebase, se verifica si alguna tarea está por finalizar
+     * y se muestra una notificación si es necesario.
+     *
+     * @return El resultado del trabajo, que puede ser [Result.success], [Result.failure] o [Result.retry].
+     */
     override suspend fun doWork(): Result {
         var tareasPorFinalizar:Int=0
         val usuarioId = inputData.getString("usuarioId") ?: return Result.failure()
@@ -45,6 +59,12 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         return Result.success()
     }
 
+    /**
+     * Obtiene las tareas del usuario desde Firebase de forma asíncrona.
+     *
+     * @param usuarioId El ID del usuario.
+     * @return Una lista de tareas obtenidas desde Firebase.
+     */
     private suspend fun obtenerTareasDesdeFirebase(usuarioId: String): List<Tarea> {
         return suspendCancellableCoroutine { continuation ->
             obtenerTareas(usuarioId) { tareas ->
@@ -53,7 +73,12 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         }
     }
 
-    // Adaptación de tu método original
+    /**
+     * Obtiene las tareas de un usuario desde Firebase.
+     *
+     * @param usuarioId El ID del usuario.
+     * @param onComplete La función de callback que se llama cuando se completan las tareas.
+     */
     private fun obtenerTareas(usuarioId: String, onComplete: (List<Tarea>) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
@@ -71,6 +96,12 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
             }
     }
 
+    /**
+     * Verifica si una tarea está por finalizar.
+     *
+     * @param tarea La tarea a verificar.
+     * @return true si la tarea está por finalizar, de lo contrario false.
+     */
     private fun isTareaPorFinalizar(tarea: Tarea): Boolean {
         val currentTime = Calendar.getInstance().timeInMillis
         val tareaTime = tarea.fecha?.time ?: 0
@@ -79,11 +110,16 @@ class RecordatorioTareasWorker(appContext: Context, workerParams: WorkerParamete
         return diff in 0..oneDayInMillis
     }
 
+    /**
+     * Muestra una notificación de recordatorio de tareas.
+     *
+     * @param numeroDeTareas El número de tareas por finalizar.
+     */
     private fun mostrarNotificacion(numeroDeTareas: Int) {
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Crear el canal de notificación (solo para Android O y superior)
+        // Crear el canal de notificación
         val channel = NotificationChannel(
             "TASK_REMINDER_CHANNEL",
             "Task Reminder",

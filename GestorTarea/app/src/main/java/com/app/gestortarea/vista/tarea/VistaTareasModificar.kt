@@ -33,6 +33,13 @@ import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import java.util.Date
 
+/**
+ * Composable que representa la vista para modificar tareas.
+ * Utiliza una barra de navegación personalizada y llama al contenido de la vista.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun VistaTareasModificar(
     navController: NavController,
@@ -43,8 +50,16 @@ fun VistaTareasModificar(
     }
 }
 
+/**
+ * Composable que contiene el contenido de la vista de modificación de tareas.
+ * Permite editar, completar y eliminar una tarea existente.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel: SharedViewModel) {
+    // Variables de estado
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fechaFinAntigua by remember { mutableStateOf<Date?>(null) }
@@ -53,6 +68,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    // Efecto lanzado una vez para obtener los datos de la tarea
     LaunchedEffect(Unit) {
         sharedViewModel.obtenerTareaPorTitulo(
             context,
@@ -69,12 +85,14 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
         }
     }
 
+    // Contenido principal
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         item {
+            // Botón de retroceso
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
                 contentDescription = null,
@@ -83,6 +101,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                     .clickable { navController.navigate(Vistas.VistaTareas.route) }
             )
 
+            // Icono de edición
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,7 +114,8 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                     modifier = Modifier.size(60.dp)
                 )
             }
-            // Título
+
+            // Campo de entrada para el título
             InputComun(
                 titulo = "Titulo:",
                 placeholder = "Título",
@@ -103,7 +123,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                 onvalueChange = { value -> titulo = value }
             )
 
-            // Descripción
+            // Campo de entrada para la descripción
             InputComun(
                 titulo = "Descripción:",
                 placeholder = "Descripción",
@@ -111,13 +131,13 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                 onvalueChange = { value -> descripcion = value }
             )
 
-            // Fecha de fin
+            // Selector de fecha
             MiDatePicker(
                 onFechaSeleccionada = { fecha -> fechaFin = fecha },
                 fechaInicial = fechaFin
             )
 
-            // Botón de editar
+            // Botón para editar la tarea
             botonEnvio(
                 "editar tarea",
                 "normal",
@@ -143,7 +163,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                 }
             }
 
-            // Botón de hecho
+            // Botón para marcar la tarea como completada
             if (!completada) {
                 botonEnvio(
                     "Terminar tarea",
@@ -168,6 +188,7 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                 }
             }
 
+            // Botón para eliminar la tarea
             botonEnvio(
                 "borrar tarea",
                 "borrado",
@@ -177,6 +198,8 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
             }
         }
     }
+
+    // Diálogo de confirmación para eliminar la tarea
     if (showDialog) {
         PopUpConfirmacion(
             titulo = "¿Estas seguro que deseas eliminar esta tarea?",

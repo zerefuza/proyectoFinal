@@ -9,6 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Componente composable que muestra un campo de entrada de texto común.
+ *
+ * @param placeholder      El texto de marcador de posición para el campo de entrada.
+ * @param value            El valor actual del campo de entrada.
+ * @param titulo           El título del campo de entrada.
+ * @param onvalueChange    La acción a realizar cuando cambia el valor del campo de entrada.
+ */
 @Composable
 fun InputComun(
     placeholder: String,

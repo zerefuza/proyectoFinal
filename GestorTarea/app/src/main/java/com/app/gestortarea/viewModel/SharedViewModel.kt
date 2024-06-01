@@ -19,37 +19,67 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.launch
 import java.util.Date
 
+/**
+ * ViewModel que gestiona la lógica de negocio y la interacción con Firebase para la funcionalidad relacionada con las tareas y usuarios.
+ */
 class SharedViewModel : ViewModel() {
+    // Autenticación de Firebase
     private val auth: FirebaseAuth = Firebase.auth
+
+    // Indicador de carga
     private val _loading = MutableLiveData(false)
+
+    // Instancia de Firestore
     private val db = Firebase.firestore
 
-    //guardar email
+    // Email del usuario actual
     private val _userEmail = mutableStateOf<String>("")
     val userEmail: State<String> = _userEmail
 
+    /**
+     * Establece el email del usuario actual.
+     *
+     * @param _userEmail Email del usuario.
+     */
     fun setuserEmail(_userEmail: String) {
         this._userEmail.value = _userEmail
     }
 
-    //guardar titulo tarea
+    // Título de la tarea seleccionada
     private val _tituloTarea = mutableStateOf<String>("")
     val tituloTarea: State<String> = _tituloTarea
 
+    /**
+     * Establece el título de la tarea seleccionada.
+     *
+     * @param _tituloTarea Título de la tarea.
+     */
     fun setTituloTarea(_tituloTarea: String) {
         this._tituloTarea.value = _tituloTarea
     }
 
-    //guardar fecha tarea
+    // Fecha de la tarea seleccionada
     private val _fechaTarea = mutableStateOf<Date?>(null)
     val fechaTarea: State<Date?> = _fechaTarea
 
+    /**
+     * Establece la fecha de la tarea seleccionada.
+     *
+     * @param _fechaTarea Fecha de la tarea.
+     */
     fun setFechaTarea(_fechaTarea: Date?) {
         this._fechaTarea.value = _fechaTarea
     }
 
-    //login de usuario auth
-    fun loginUsuario(
+    /**
+     * Inicia sesión de un usuario utilizando su correo electrónico y contraseña.
+     *
+     * @param email Correo electrónico del usuario.
+     * @param password Contraseña del usuario.
+     * @param context Contexto de la aplicación.
+     * @param onSuccess Callback para la acción exitosa.
+     * @param onError Callback para la acción con error.
+     */    fun loginUsuario(
         email: String,
         password: String,
         context: Context,
@@ -85,7 +115,14 @@ class SharedViewModel : ViewModel() {
             }
         }
 
-    //registrar un usuario en el firebase
+    /**
+     * Registra un nuevo usuario en Firebase utilizando su correo electrónico y contraseña.
+     *
+     * @param email Correo electrónico del usuario.
+     * @param password Contraseña del usuario.
+     * @param onSuccess Callback para la acción exitosa.
+     * @param onError Callback para la acción con error.
+     */
     fun registrarUsuario(
         email: String,
         password: String,
@@ -106,7 +143,12 @@ class SharedViewModel : ViewModel() {
         }
     }
 
-    //agregar usuarios a la DB
+    /**
+     * Agrega un usuario a la base de datos.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuario Objeto de tipo Usuario que se va a agregar.
+     */
     fun agregarUsuario(context: Context,usuario: Usuario) {
         val collectionRef = db.collection("usuarios")
         val documentRef = collectionRef.document(usuario.email)
@@ -120,7 +162,14 @@ class SharedViewModel : ViewModel() {
             }
     }
 
-    //agregar tareas
+    /**
+     * Agrega una nueva tarea a la base de datos del usuario. Si el usuario no tiene una colección de tareas, se creará una.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioId ID del usuario al que pertenece la tarea.
+     * @param tarea Tarea que se va a agregar.
+     * @param onSuccess Callback para la acción exitosa.
+     */
     fun agregarTarea(context: Context,usuarioId: String, tarea: Tarea,onSuccess: () -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
@@ -131,7 +180,6 @@ class SharedViewModel : ViewModel() {
                     // Si la subcolección de tareas no existe, crear un documento inicial
                     usuarioDocRef.collection("tareas").document(tarea.nombre).set(tarea)
                         .addOnSuccessListener {
-                            // Después de crear el documento inicial, agregar la tarea
                             FileLogger.logToFile(context, "Firestore", "Se ha creado el documento inicial de tareas")
                             onSuccess()
                         }
@@ -150,6 +198,14 @@ class SharedViewModel : ViewModel() {
             }
     }
 
+    /**
+     * Agrega una tarea a la base de datos.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioDocRef Referencia al documento del usuario en Firestore.
+     * @param tarea Tarea que se va a agregar.
+     * @param onSuccess Callback para la acción exitosa.
+     */
     private fun agregarTareaReal(context: Context,usuarioDocRef: DocumentReference, tarea: Tarea,onSuccess: () -> Unit) {
         val documentRef = usuarioDocRef.collection("tareas").document(tarea.nombre)
 
@@ -163,7 +219,15 @@ class SharedViewModel : ViewModel() {
             }
     }
 
-    //modificar tarea
+    /**
+     * Modifica una tarea en la base de datos.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioId ID del usuario al que pertenece la tarea.
+     * @param tituloAntiguo Título antiguo de la tarea.
+     * @param tarea Nueva información de la tarea.
+     * @param onSuccess Callback para la acción exitosa.
+     */
     fun modificarTarea(context: Context,usuarioId: String, tituloAntiguo: String, tarea: Tarea,onSuccess: () -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
         val tareaAntiguaDocRef = usuarioDocRef.collection("tareas").document(tituloAntiguo)
@@ -200,8 +264,13 @@ class SharedViewModel : ViewModel() {
             }
     }
 
-
-    //Recuperar todas las tareas
+    /**
+     * Obtiene todas las tareas de un usuario.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioId ID del usuario del que se obtienen las tareas.
+     * @param onComplete Callback que se ejecuta al completar la obtención de las tareas.
+     */
     fun obtenerTareas(context: Context,usuarioId: String, onComplete: (List<Tarea>) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
@@ -220,7 +289,14 @@ class SharedViewModel : ViewModel() {
             }
     }
 
-    //recuperar una tarea por titulo
+    /**
+     * Obtiene una tarea por su título.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioId ID del usuario del que se obtiene la tarea.
+     * @param titulo Título de la tarea a obtener.
+     * @param onComplete Callback que se ejecuta al completar la obtención de la tarea.
+     */
     fun obtenerTareaPorTitulo(context: Context,usuarioId: String, titulo: String, onComplete: (Tarea?) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
@@ -237,7 +313,14 @@ class SharedViewModel : ViewModel() {
             }
     }
 
-    //borrar tarea
+    /**
+     * Borra tareas por su título.
+     *
+     * @param context Contexto de la aplicación.
+     * @param usuarioId ID del usuario del que se eliminan las tareas.
+     * @param titulo Título de las tareas a eliminar.
+     * @param onComplete Callback que se ejecuta al completar la eliminación de las tareas.
+     */
     fun borrarTareasPorTitulo(context: Context,usuarioId: String, titulo: String, onComplete: (Boolean) -> Unit) {
         val usuarioDocRef = db.collection("usuarios").document(usuarioId)
 
@@ -266,6 +349,13 @@ class SharedViewModel : ViewModel() {
             }
     }
 
+    /**
+     * Envía un correo electrónico de recuperación de contraseña.
+     *
+     * @param email Correo electrónico al que se envía el enlace de recuperación.
+     * @param onSuccess Callback para la acción exitosa.
+     * @param onError Callback para la acción con error.
+     */
     fun emailRecuperacionContrasenia(email: String, onSuccess: () -> Unit,onError: () -> Unit) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener{

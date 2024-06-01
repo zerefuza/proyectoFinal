@@ -14,7 +14,13 @@ import com.app.gestortarea.vista.tarea.VistaTareas
 import com.app.gestortarea.vista.tarea.VistaTareasAgregar
 import com.app.gestortarea.vista.tarea.VistaTareasModificar
 
-
+/**
+ * Define la estructura de navegación de la aplicación.
+ * Este método configura las rutas de navegación y los composable asociados a cada una.
+ *
+ * @param navController El controlador de navegación que gestionará la navegación entre los diferentes destinos.
+ * @param sharedViewModel El ViewModel compartido entre los diferentes composable de la aplicación.
+ */
 @Composable
 fun NavGraph(
     navController: NavHostController,

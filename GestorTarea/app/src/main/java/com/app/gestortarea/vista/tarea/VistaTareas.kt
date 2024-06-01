@@ -56,6 +56,13 @@ import com.app.gestortarea.viewModel.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Composable que representa la vista de tareas.
+ * Utiliza una barra de navegación personalizada y llama al contenido de la vista.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun VistaTareas(
     navController: NavController,
@@ -66,6 +73,13 @@ fun VistaTareas(
     }
 }
 
+/**
+ * Composable que contiene el contenido de la vista de tareas.
+ * Muestra las tareas clasificadas por niveles de urgencia y permite filtrar las tareas.
+ *
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedViewModel) {
     val context = LocalContext.current
@@ -78,8 +92,9 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
     var expanded by remember { mutableStateOf(false) }
     var opcionFiltro by remember { mutableStateOf(urgenciaOptions.first()) }
 
+    // Cargar las tareas al inicializar el componente
     LaunchedEffect(Unit) {
-        sharedViewModel.obtenerTareas(context,sharedViewModel.userEmail.value) { tareasObtenidas ->
+        sharedViewModel.obtenerTareas(context, sharedViewModel.userEmail.value) { tareasObtenidas ->
             tareasPasadas = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.PASADAS.valor)
             tareasPocoUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.POCO_URGENTE.valor)
             tareasUrgentes = obtenerTareasPorUrgencia(tareasObtenidas, NivelUrgencia.URGENTE.valor)
@@ -88,9 +103,10 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         }
     }
 
-    //Columnas de tareas
+    // Contenido principal de la vista
     LazyColumn {
         item {
+            // Botón de filtro
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,6 +123,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
                     )
                 }
 
+                // Menú desplegable de filtros
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
@@ -124,7 +141,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
             }
         }
 
-        //columnas de tareas
+        // Mostrar las tareas según el filtro seleccionado
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.MUY_URGENTE.valor) {
             item {
                 Text(
@@ -171,6 +188,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
                 }
             }
         }
+
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.PASADAS.valor) {
             item {
                 Text(
@@ -183,6 +201,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
                 }
             }
         }
+
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.COMPLETADAS.valor) {
             item {
                 Text(
@@ -201,6 +220,7 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         }
     }
 
+    // Botón flotante para añadir una nueva tarea
     Row(
         modifier = Modifier
             .fillMaxSize(),
@@ -221,7 +241,13 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
     }
 }
 
-
+/**
+ * Composable que muestra un grupo de tareas en una fila horizontal.
+ *
+ * @param tareas Lista de tareas a mostrar.
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun TareaGrupo(
     tareas: List<Tarea>,
@@ -240,6 +266,13 @@ fun TareaGrupo(
     }
 }
 
+/**
+ * Composable que representa una fila de tarea individual.
+ *
+ * @param tarea Tarea a mostrar.
+ * @param navController Controlador de navegación para gestionar la navegación entre pantallas.
+ * @param sharedViewModel ViewModel compartido que gestiona las acciones de la aplicación.
+ */
 @Composable
 fun TareaRow(
     tarea: Tarea,
@@ -302,6 +335,3 @@ fun TareaRow(
         }
     }
 }
-
-
-

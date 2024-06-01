@@ -10,6 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
+/**
+ * Componente composable para mostrar un cuadro de diálogo de información.
+ *
+ * @param titulo           El título del cuadro de diálogo.
+ * @param descripcion      La descripción o mensaje a mostrar en el cuadro de diálogo.
+ * @param onSuccess        La acción a realizar al hacer clic en el botón "OK".
+ * @param onDismissRequest La acción a realizar al cerrar el cuadro de diálogo.
+ */
 @Composable
 fun PopUpInformacion(
     titulo: String,

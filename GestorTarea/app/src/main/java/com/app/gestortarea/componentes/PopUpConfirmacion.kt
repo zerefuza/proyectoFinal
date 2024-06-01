@@ -18,6 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Componente composable para mostrar un cuadro de diálogo de confirmación.
+ *
+ * @param titulo           El título del cuadro de diálogo.
+ * @param descripcion      La descripción o mensaje a mostrar en el cuadro de diálogo.
+ * @param onSuccess        La acción a realizar al hacer clic en el botón "OK".
+ * @param onError          La acción a realizar al hacer clic en el botón "Cancel".
+ * @param onDismissRequest La acción a realizar al cerrar el cuadro de diálogo.
+ */
 @Composable
 fun PopUpConfirmacion(
     titulo: String,

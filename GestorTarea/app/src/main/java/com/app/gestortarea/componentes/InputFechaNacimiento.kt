@@ -11,7 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
-
+/**
+ * Componente composable que muestra un campo de entrada para la fecha de nacimiento.
+ *
+ * @param day                      El día seleccionado.
+ * @param month                    El mes seleccionado.
+ * @param year                     El año seleccionado.
+ * @param onDaySeleccionada        La acción a realizar cuando se selecciona un día.
+ * @param onMesSeleccionada        La acción a realizar cuando se selecciona un mes.
+ * @param onYearSeleccionada       La acción a realizar cuando se selecciona un año.
+ */
 @Composable
 fun FechaNacimientoInput(
     day : String,
