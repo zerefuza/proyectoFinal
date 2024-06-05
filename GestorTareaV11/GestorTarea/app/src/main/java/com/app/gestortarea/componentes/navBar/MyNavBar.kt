@@ -203,6 +203,7 @@ fun MyDrawerContentUser(
 
             Text(
                 text = email ?: "",
+                color= Color.White,
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .align(Alignment.CenterHorizontally),
@@ -267,13 +268,15 @@ fun DrawerItem(
     ) {
         Icon(
             imageVector = icon,
+            tint = Color.White,
             contentDescription = null,
             modifier = Modifier
                 .size(35.dp)
                 .padding(end = 16.dp)
         )
         Text(
-            text = text
+            text = text,
+            color = Color.White
         )
     }
 }

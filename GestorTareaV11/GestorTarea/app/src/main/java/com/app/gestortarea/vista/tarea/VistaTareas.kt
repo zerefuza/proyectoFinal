@@ -144,12 +144,12 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
         // Mostrar las tareas según el filtro seleccionado
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.MUY_URGENTE.valor) {
             item {
-                Text(
-                    text = "Muy Urgentes",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
-                )
                 if (tareasMuyUrgentes.isNotEmpty()) {
+                    Text(
+                        text = "Muy Urgentes",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
                     TareaGrupo(
                         tareas = tareasMuyUrgentes,
                         navController,
@@ -161,12 +161,12 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.URGENTE.valor) {
             item {
-                Text(
-                    text = "Urgentes",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
-                )
                 if (tareasUrgentes.isNotEmpty()) {
+                    Text(
+                        text = "Urgentes",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
                     TareaGrupo(tareas = tareasUrgentes, navController, sharedViewModel)
                 }
             }
@@ -174,12 +174,12 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.POCO_URGENTE.valor) {
             item {
-                Text(
-                    text = "Poco Urgentes",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
-                )
                 if (tareasPocoUrgentes.isNotEmpty()) {
+                    Text(
+                        text = "Poco Urgentes",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
                     TareaGrupo(
                         tareas = tareasPocoUrgentes,
                         navController,
@@ -191,12 +191,12 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.PASADAS.valor) {
             item {
-                Text(
-                    text = "Tareas Pasadas de fecha",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
-                )
                 if (tareasPasadas.isNotEmpty()) {
+                    Text(
+                        text = "Tareas Pasadas de fecha",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
                     TareaGrupo(tareas = tareasPasadas, navController, sharedViewModel)
                 }
             }
@@ -204,12 +204,12 @@ fun ContenidoVistaTareas(navController: NavController, sharedViewModel: SharedVi
 
         if (opcionFiltro == "TODOS" || opcionFiltro == NivelUrgencia.COMPLETADAS.valor) {
             item {
-                Text(
-                    text = "Tareas Completadas",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
-                )
                 if (tareasCompletadas.isNotEmpty()) {
+                    Text(
+                        text = "Tareas Completadas",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
                     TareaGrupo(
                         tareas = tareasCompletadas,
                         navController,
