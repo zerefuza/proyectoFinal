@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.app.gestortarea.R
+import com.app.gestortarea.log.FileLogger
 import com.app.gestortarea.nav.Vistas
 import com.app.gestortarea.viewModel.SharedViewModel
 import kotlinx.coroutines.delay
@@ -54,7 +55,8 @@ fun InicioSplashVista(navController: NavController, sharedViewModel: SharedViewM
             )
         )
         delay(2000)
-
+        //limpiar los log
+        FileLogger.clearLogs(context)
         // Navegación basada en el estado de inicio de sesión
         if (isLoggedIn && email != null) {
             sharedViewModel.setuserEmail(email)

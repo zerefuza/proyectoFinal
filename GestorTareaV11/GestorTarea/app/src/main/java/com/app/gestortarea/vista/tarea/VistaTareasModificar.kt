@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.app.gestortarea.componentes.InputComun
 import com.app.gestortarea.componentes.MiDatePicker
 import com.app.gestortarea.componentes.PopUpConfirmacion
+import com.app.gestortarea.componentes.PopUpInformacion
 import com.app.gestortarea.componentes.botonEnvio
 import com.app.gestortarea.componentes.enableTarea
 import com.app.gestortarea.componentes.navBar.MyNavBar
@@ -60,12 +61,14 @@ fun VistaTareasModificar(
 @Composable
 fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel: SharedViewModel) {
     // Variables de estado
+    var error by remember { mutableStateOf("") }
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fechaFinAntigua by remember { mutableStateOf<Date?>(null) }
     var fechaFin by remember { mutableStateOf<Date?>(null) }
     var completada by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showDialogError by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     // Efecto lanzado una vez para obtener los datos de la tarea
@@ -146,20 +149,31 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
                     fechaFin
                 )
             ) {
-                val tareaData = Tarea(
-                    nombre = titulo,
-                    descripcion = descripcion,
-                    fecha = fechaFin,
-                    completada = false
-                )
-                sharedViewModel.modificarTarea(
+                sharedViewModel.obtenerTareaPorTitulo(
                     context,
                     sharedViewModel.userEmail.value,
-                    sharedViewModel.tituloTarea.value,
-                    tareaData
-                ) {
-                    sharedViewModel.setTituloTarea("")
-                    navController.navigate(Vistas.VistaTareas.route)
+                    titulo
+                ) { tareaObtenida ->
+                    if (tareaObtenida == null) {
+                        val tareaData = Tarea(
+                            nombre = titulo,
+                            descripcion = descripcion,
+                            fecha = fechaFin,
+                            completada = false
+                        )
+                        sharedViewModel.modificarTarea(
+                            context,
+                            sharedViewModel.userEmail.value,
+                            sharedViewModel.tituloTarea.value,
+                            tareaData
+                        ) {
+                            sharedViewModel.setTituloTarea("")
+                            navController.navigate(Vistas.VistaTareas.route)
+                        }
+                    } else {
+                        showDialogError = true
+                        error = "El título de la tarea ya existe"
+                    }
                 }
             }
 
@@ -223,6 +237,16 @@ fun ContenidoVistaTareasModificar(navController: NavController, sharedViewModel:
             onDismissRequest = {
                 showDialog = false
             }
+        )
+    }
+
+    // Diálogo de información de error
+    if (showDialogError) {
+        PopUpInformacion(
+            titulo = "Error",
+            descripcion = error,
+            onSuccess = { showDialogError = false },
+            onDismissRequest = { showDialogError = false }
         )
     }
 }

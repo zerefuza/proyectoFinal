@@ -258,7 +258,7 @@ fun RegistroUsuarioVista(
  * @param year El año de nacimiento como cadena de texto.
  * @return El objeto Date que representa la fecha de nacimiento si las cadenas de texto son válidas y representan una fecha válida; de lo contrario, devuelve null.
  */
-fun analizarFechaNacimiento(day: String, month: String, year: String): Date? {
+private fun analizarFechaNacimiento(day: String, month: String, year: String): Date? {
     try {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val fecha = "$day/$month/$year"

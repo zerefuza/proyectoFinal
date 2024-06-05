@@ -37,4 +37,11 @@ object FileLogger {
             Log.e(LOG_TAG, "Error writing log to file", e)
         }
     }
+
+    fun clearLogs(context: Context) {
+        val logFile = File(context.filesDir, LOG_FILE_NAME)
+        if (logFile.exists()) {
+            logFile.delete()
+        }
+    }
 }
